@@ -1,0 +1,599 @@
+Joins
+
+employees
+
+| emp_id | name | department | salary |
+
+departments
+
+| dept_id | dept_name | location |
+
+Now question:
+
+👉 How do we combine employee details with department location?
+
+Answer: JOIN.
+
+
+Inner Join
+--------------
+
+Returns only matching records from both tables.
+
+SELECT e.name, e.salary, d.location
+FROM employees e
+INNER JOIN departments d
+    ON e.department = d.dept_name;
+
+Left join
+--------------
+
+All rows from LEFT table
+
+Matching rows from RIGHT table
+
+If no match → NULL
+
+SELECT e.name, d.location
+FROM employees e
+LEFT JOIN departments d
+    ON e.department = d.dept_name;
+
+Used when:
+You want all employees, even if department missing.
+
+Right join
+---------------
+
+RIGHT JOIN
+
+Opposite of LEFT.
+
+SELECT e.name, d.location
+FROM employees e
+RIGHT JOIN departments d
+    ON e.department = d.dept_name;
+
+Usually avoided in real projects (LEFT is preferred).
+
+FULL JOIN
+__________________
+
+
+All records from both tables.
+
+(Only supported in some DBs like PostgreSQL, not MySQL directly)
+
+
+
+Window function 
+---------------------------
+
+It performs calculation:
+
+Across a group of rows                        
+
+But WITHOUT collapsing rows like GROUP BY
+
+👉 That is the key difference.
+
+
+If two employees have same salary (Arun & Meena = 60000)
+
+ROW_NUMBER()
+
+Gives unique numbers:
+4, 5
+
+RANK()
+
+Gives:
+4, 4
+Next becomes 6 (skips 5)
+
+DENSE_RANK()
+
+Gives:
+4, 4
+Next becomes 5 (no skipping)
+
+
+
+I want:
+
+👉 For each sale, show previous sale amount of same employee
+
+Meaning:
+
+| sale_date | sale_amount | previous_sale |
+
+What window function do we use?
+
+Think before answering 😎
+
+This is where window functions split into two categories.
+
+Ranking functions:
+
+ROW_NUMBER
+
+RANK
+
+DENSE_RANK
+
+Navigation functions:
+
+LAG()--its show previous values
+
+LEAD()--opp to lag it shows next values
+
+For:
+
+👉 “Show previous sale amount of same employee”
+
+
+FIRST_VALUE() return first value of each sale or in window functions
+
+Last_VALUE() rturns last value
+
+Window Frame Clause (VERY IMPORTANT)
+
+This controls how many rows the function sees.
+
+Default Frame (when ORDER BY used)
+RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+
+This means:
+Start → First row
+End → Current row
+
+Common Frame Types
+🔹 Running Total
+ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+🔹 Moving 3-row Window
+ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+🔹 Full Partition
+ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+5️⃣ Moving Average (Real Production Use 🔥)
+
+Very important in:
+
+Sales trend analysis
+
+Stock analysis
+
+Revenue smoothing
+
+KPI dashboards
+
+
+
+Window Functions That REQUIRE ORDER BY
+
+Now look at:
+
+ROW_NUMBER()
+
+RANK()
+
+DENSE_RANK()
+
+LAG()
+
+LEAD()
+
+FIRST_VALUE()
+
+LAST_VALUE()
+
+NTILE()
+
+
+CTE
+------------------
+
+CTE stands for common table expression its creating a temporary named result set
+
+Instead of writing a long complex query inside another query,
+you give it a name first.
+
+It improves:
+
+Readability
+
+Debugging
+
+Maintenance
+
+Interview clarity
+
+syntax 
+----------
+WITH cte_name AS (
+    SELECT ...
+)
+SELECT * 
+FROM cte_name;
+
+
+
+
+Why Engineers Prefer CTE
+
+Imagine 300-line query.
+
+With subqueries → nested brackets → headache.
+
+With CTE:
+
+Step 1: Prepare data
+Step 2: Calculate ranking
+Step 3: Filter top results
+Step 4: Final output
+
+
+
+----------------------------------------------------------------------------------
+
+
+ETL  /ELT Starts
+
+
+===================
+
+
+ETL = Extract → Transform → Load
+
+But in real world, it means:
+Moving data from multiple systems → cleaning it → storing it in analytics database → making it usable for business
+
+
+ETL = Extract → Transform → Load
+
+But in real world, it means:
+
+Moving data from multiple systems → cleaning it → storing it in analytics database → making it usable for business
+
+
+
+Real world pipe line idea
+---------------------------------
+Your manager says:
+
+“We need daily sales report at 8AM. Build pipeline.”
+
+What will you do?
+
+Answer structure:
+
+Identify source
+
+Design schema
+
+Create ETL job
+
+Schedule job
+
+Add logging
+
+Add error handling
+
+Optimize performance
+
+
+
+
+🧠 When to Use Each?
+Pattern	Best When
+ETL	Pre-processing data before load
+ELT	Load first, transform later in warehouse
+
+
+ETL vs ELT: Simple Mental Model
+
+ETL: Clean then store
+ELT: Store then clean
+
+Example:
+
+ETL:
+Load CSV → remove bad data → write to final table
+
+ELT:
+Load CSV into raw zone → run SQL to transform → write to curated zone
+
+
+Industry trend:
+✅ ELT is more common with cloud warehouses
+(e.g., Azure Synapse, Snowflake)
+
+
+ETL does:
+
+Extract
+
+Fetch daily orders
+
+Fetch payment status
+
+Read web logs
+
+Transform
+
+Clean missing values
+
+Standardize currency
+
+Join orders → payments
+
+Remove duplicates
+
+Aggregate daily totals
+
+Load
+
+Write final table into:
+
+Data Warehouse (Azure Synapse / Snowflake)
+
+Data Mart for BI tools (Power BI / Tableau)
+
+
+
+idempotent  --means upsert-(update+insert), merge
+
+
+Slowly Changing Dimensions (SCD)
+-----------------------------------
+
+Used for tracking history.
+
+
+there are two types of scd
+scd type--overwrite  means old data is replaced by new data
+scd type2 -tracking the history  its stores both new and old data history
+
+
+-----
+CDC(Change Data Capture)
+
+Instead of scanning full tables, pipelines detect only changed rows.
+
+This makes pipelines 10x faster.
+
+
+
+--ETL Logging and Monitoring 
+
+/* Because real pipelines must track:
+
+pipeline start time
+pipeline end time
+rows processed
+errors
+status (success / failed)*/
+
+CREATE TABLE pipeline_log (
+pipeline_name TEXT,
+step_name TEXT,
+status TEXT,
+rows_processed INTEGER,
+start_time DATETIME,
+end_time DATETIME
+);
+
+
+
+/*Orchestration
+
+This means automating ETL pipelines.
+
+Example schedule:
+
+Daily pipeline → 2:00 AM
+Hourly pipeline → every hour
+Real-time pipeline → continuous
+
+DAG (Directed Acyclic Graph)
+
+Orchestration pipelines are usually represented as a DAG.
+
+Real Production Workflow
+
+Typical enterprise data pipeline:
+
+Source Systems
+      ↓
+ETL Pipelines
+      ↓
+Orchestration Layer
+      ↓
+Data Warehouse
+      ↓
+BI Dashboards
+
+
+*/
+
+
+
+/*  Next Very Important Topic
+
+Now we move into something that every modern data engineer uses:
+
+Batch Processing vs Stream Processing
+
+Batch example:
+
+Daily sales pipeline → run at night(Data is processed in large chunks at scheduled times.) 
+
+Stream example:
+
+Process orders instantly when they arrive (Data is processed immediately when events arrive.)
+
+*/
+
+
+
+
+/*What is a Data Lake
+
+A Data Lake is a storage system that keeps all types of data in raw format.
+
+It can store:
+
+Structured data(tables)
+Semi-structured data(json,xml)
+Unstructured data(images.files)
+*/
+
+
+/*Lakehouse Architecture
+
+This is the modern architecture used by most companies today.
+
+It combines:
+
+Data Lake + Data Warehousecustomers(warehouse only stores structural data tables)
+
+Companies moved to Lakehouse architecture because it provides:
+
+✔ Faster analytics
+✔ Better data reliability
+*/
+
+
+
+Azure Data Engineer Architecture
+
+Typical Azure pipeline looks like this:
+
+Source Systems
+      ↓
+Azure Data Factory
+      ↓
+Azure Data Lake Storage
+      ↓
+Azure Databricks (Spark Processing)
+      ↓
+Azure Synapse Analytics
+      ↓
+Power BI Dashboards
+
+
+--------------------------------------------------------------
+
+Role of Each Azure Tool
+1️⃣ Data Ingestion
+
+Handled by:
+
+Azure Data Factory
+
+Used for:
+
+Copy data
+Schedule pipelines
+Orchestrate workflows
+2️⃣ Data Storage
+
+Handled by:
+
+Azure Data Lake Storage
+
+Stores:
+
+Raw data
+Processed data
+Analytics data
+
+Usually organized as:
+
+Bronze
+Silver
+Gold
+3️⃣ Data Processing
+
+Handled by:
+
+Azure Databricks
+
+Used for:
+
+Spark transformations
+Large scale processing
+Streaming pipelines
+4️⃣ Data Warehouse
+
+Handled by:
+
+Azure Synapse Analytics
+
+Used for:
+
+SQL analytics
+Star schema tables
+BI queries
+
+
+
+
+Why Parquet Is Best for Big Data
+
+Parquet is a columnar storage format, which means data is stored by columns instead of rows.
+
+Example table:
+
+order_id	customer	amount
+101	          Ravi	         500
+102	          Priya	         300
+
+
+
+FileFormat Comparison
+----------------------------
+Format		Use case
+
+CSV  		simple data exchange
+JSON 		semi-structured data
+Parquet		big data analytics
+Delta		lakehouse tables
+
+
+
+What is Apache Spark
+
+Apache Spark is a framework that processes huge datasets across multiple machines.
+
+Instead of one computer processing data:
+
+1 computer → very slow
+
+Spark splits work across many machines in parallel.
+
+Spark Architecture (Simple View)
+Driver Program
+      ↓
+Cluster Manager
+      ↓
+Worker Nodes
+      ↓
+Tasks executed in parallel
+
+Components:
+
+Component	Role
+Driver	controls job
+Executors	perform tasks
+Cluster	group of machines
+
+
+pyspark
+
+Operation	Example
+Select columns	select()
+Filter rows	filter()
+Group data	groupBy()
+Join tables	join()
+Sort data	orderBy()
+
