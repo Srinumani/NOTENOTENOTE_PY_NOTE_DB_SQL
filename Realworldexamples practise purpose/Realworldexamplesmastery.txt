@@ -1,3 +1,4 @@
+---pieline---
 CREATE TABLE customers_source (
     customer_id INTEGER PRIMARY KEY,
     name TEXT,

@@ -1,0 +1,190 @@
+Azure Data Enginner course https://youtu.be/bSx3DbJNQk4?si=kMK54VBMqWpJkh0X anush lamba
+
+
+
+
+Topics we covered in until now and still pending
+
+1️⃣ Topics You Already Completed ✅
+SQL (Strong Foundation)
+
+You completed many advanced SQL topics:
+
+Core SQL
+
+SELECT
+
+WHERE
+
+GROUP BY
+
+HAVING
+
+JOINS
+
+Advanced SQL
+
+Window Functions
+
+ROW_NUMBER
+
+RANK
+
+DENSE_RANK
+
+FIRST_VALUE
+
+LAST_VALUE
+
+NTILE
+
+Window Frame
+
+Moving Average
+
+Advanced Query Design
+
+Subqueries
+
+CTE (Common Table Expressions)
+
+Query optimization
+
+Indexes
+
+Composite indexes
+
+Covering indexes
+
+ETL Concepts
+
+You also covered core ETL pipeline concepts used by data engineers.
+
+Topics done:
+
+ETL fundamentals
+
+Staging layer
+
+Fact table
+
+Dimension table
+
+Incremental load
+
+Timestamp-based CDC
+
+Pipeline metadata table
+
+SCD Type 1
+
+SCD Type 2
+
+Data lake layers
+
+Pipeline execution order
+
+Big Data Concepts
+
+You learned important big data concepts:
+
+Structured vs Unstructured data
+
+Data formats
+
+JSON
+
+Parquet
+
+Distributed processing basics
+
+2️⃣ What We Are Doing Right Now 🟡
+
+Current stage:
+
+Setting up Spark environment
+
+Tools:
+
+Python
+
+PySpark
+
+Apache Spark
+
+OpenJDK
+
+Once Java works, we start Spark training.
+
+3️⃣ Topics Still Pending 📚
+Spark Fundamentals
+
+We will cover:
+
+Spark architecture
+
+Driver vs Executor
+
+SparkSession
+
+DataFrames
+
+Transformations
+
+Actions
+
+Lazy evaluation
+
+Spark Data Processing
+
+Important real-world topics:
+
+Reading JSON / CSV
+
+Writing Parquet
+
+DataFrame operations
+
+Joins
+
+Aggregations
+
+Window functions in Spark
+
+Data Engineering Pipelines
+
+Real production topics:
+
+Incremental pipelines
+
+CDC pipelines
+
+Partitioning
+
+Data lake architecture
+
+Bronze / Silver / Gold layers
+
+Fact table creation
+
+Cloud Data Engineering
+
+For Azure roles:
+
+Azure Data Factory
+
+Azure Databricks
+
+Azure Data Lake Storage
+
+4️⃣ Completion Status 📊
+
+Approximate progress for Data Engineer learning path:
+
+Area	Completion
+SQL	90%
+ETL	70%
+Data Engineering Concepts	60%
+Spark	0% (about to start)
+Cloud Tools	0%
+
