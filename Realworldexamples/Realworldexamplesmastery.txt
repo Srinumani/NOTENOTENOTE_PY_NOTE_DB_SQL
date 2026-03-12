@@ -1,0 +1,884 @@
+CREATE TABLE customers_source (
+    customer_id INTEGER PRIMARY KEY,
+    name TEXT,
+    city TEXT,
+    updated_at DATETIME
+);
+
+CREATE TABLE orders_source (
+    order_id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    order_amount INTEGER,
+    order_status TEXT,
+    updated_at DATETIME
+);
+
+ 
+
+INSERT INTO customers_source VALUES
+(1,'Ravi','Hyderabad','2025-03-01'),
+(2,'Sita','Delhi','2025-03-01'),
+(3,'Arjun','Bangalore','2025-03-01');
+
+SELECT * FROM customers_source;
+
+INSERT INTO orders_source VALUES
+(101,1,500,'Completed','2025-03-01'),
+(102,2,800,'Completed','2025-03-01'),
+(103,3,600,'Pending','2025-03-01');
+
+SELECT * from orders_source;
+
+
+CREATE TABLE pipeline_metadata (
+    pipeline_name TEXT,
+    last_run_time DATETIME
+);
+
+INSERT INTO pipeline_metadata
+VALUES ('orders_pipeline','2025-02-28');
+ 
+
+SELECT * from pipeline_metadata;
+
+
+CREATE TABLE staging_orders (
+    order_id INTEGER,
+    customer_id INTEGER,
+    order_amount INTEGER,
+    order_status TEXT,
+    updated_at DATETIME
+);
+
+INSERT into staging_orders 
+SELECT * from orders_source WHERE updated_at >
+(SELECT last_run_time from pipeline_metadata WHERE pipeline_name='orders_pipeline');
+
+SELECT * from staging_orders;
+
+
+
+--dimension table customers_source scd type 2
+CREATE TABLE dim_customers (
+    customer_key INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER,
+    name TEXT,
+    city TEXT,
+    start_date DATETIME,
+    end_date DATETIME,
+    is_current INTEGER
+);
+
+SELECT * from customers_source;
+
+ 
+INSERT INTO dim_customers (
+customer_id,name,city,start_date,end_date,is_current
+)
+SELECT customer_id, name,city,DATE('now'),NULL, 1 FROM customers_source;
+
+
+
+SELECT * from dim_customers;
+
+
+SELECT COUNT(*) from dim_customers;
+
+
+
+update customers_source set city='Chennai', updated_at='2025-03-05' WHERE customer_id=1;
+
+SELECT * from customers_source;
+SELECT * from dim_customers;
+
+
+SELECT s.* from customers_source s JOIN dim_customers c on s.customer_id=c.customer_id WHERE s.city<>c.city;
+
+UPDATE dim_customers
+SET end_date=DATE('now'),
+is_current=0
+WHERE customer_id IN
+(
+SELECT s.customer_id
+FROM customers_source s
+JOIN dim_customers d
+ON s.customer_id=d.customer_id
+WHERE d.is_current=1
+AND s.city<>d.city
+);
+
+INSERT INTO dim_customers
+(customer_id,name,city,start_date,end_date,is_current)
+SELECT
+customer_id,
+name,
+city,
+DATE('now'),
+NULL,
+1
+FROM customers_source
+WHERE customer_id=1;
+
+
+SELECT * from dim_customers;
+
+SELECT customer_id,city,is_current FROM dim_customers;
+
+
+--fact table heart of analytisc
+
+CREATE TABLE fact_sales (
+    sale_key INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER,
+    customer_key INTEGER,
+    order_amount INTEGER,
+    order_status TEXT,
+    sale_date DATE
+);
+
+INSERT INTO fact_sales
+(order_id,customer_key,order_amount,order_status,sale_date)
+
+SELECT
+s.order_id,
+d.customer_key,
+s.order_amount,
+s.order_status,
+DATE('now')
+
+FROM staging_orders s
+JOIN dim_customers d
+ON s.customer_id=d.customer_id
+
+WHERE d.is_current=1;
+
+SELECT * FROM fact_sales;
+
+SELECT * FROM dim_customers;
+
+SELECT * from orders_source;
+
+SELECT * FROM staging_orders;
+
+ 
+SELECT city, SUM(order_amount)
+FROM fact_sales f
+JOIN dim_customers d
+ON f.customer_key=d.customer_key
+GROUP BY city;
+
+SELECT * from fact_sales;
+
+SELECT COUNT(*) from fact_sales;
+
+
+
+DELETE from staging_orders;
+
+SELECT * from staging_orders;
+
+SELECT * from pipeline_metadata;
+
+update pipeline_metadata 
+SET last_run_time=Date('now') WHERE pipeline_name='orders_pipeline';
+
+SELECT * from pipeline_metadata;
+ 
+
+
+
+-------------------------------------------------practisedemo----------------------------------------------------------------------------
+CREATE TABLE customers (
+    id INT,
+    name VARCHAR(50),
+    address VARCHAR(100)
+);
+
+INSERT INTO customers VALUES 
+(101,'Ravi','Hyderabad'),
+(222,'Suresh','Chennai'),
+(322,'Priya','Bangalore'),
+(422,'Kiran','Mumbai'),
+ (522,'Anita','Delhi'),
+ (600,'Rahul','Pune'),
+ (700,'Meena','Kolkata');
+ 
+ SELECT * from customers;
+ 
+ 
+ SELECT id,name,address from customers WHERE id=522;
+ 
+ /* without creating index if retrive particular record it will scan entire table insted of that create simple id for table after retrive the 
+ data so that directly retrive data from table without scan entire table see below example */
+ 
+ CREATE INDEX idx_customerindex_id from customers on (id);
+ 
+ PRAGMA table_info(customers);
+ 
+ SELECT * from customers;
+ 
+ 
+ SELECT name , address FROM customers WHERE id in(222,322,700);
+ 
+ 
+ -----to get first few records------customers
+ 
+ SELECT * from customers ORDER By id ASC Limit 2;
+ 
+ --- to get last few records 
+ 
+ 
+ SELECT * FROM customers ORDER By id DESC LIMIT 2;
+ 
+ --- get both last and first 
+ 
+ -- by using union we get records of customers
+ 
+ SELECT * from ( SELECT * from customers ORDER BY id ASC LIMIT 2) as first_two 
+ 
+ UNION 
+ 
+ SELECT * from (SELECT * from  customers ORDER by id DESC LIMIT 2) as last_two;
+ 
+ 
+ ---------------creating employee tablecustomers
+ 
+ CREATE TABLE employee (
+    emp_id INT,
+    emp_name VARCHAR(50),
+    team_name VARCHAR(50)
+);
+
+INSERT INTO employee VALUES (1,'Ravi','Data Engineering');
+INSERT INTO employee VALUES (2,'Suresh','Data Engineering');
+INSERT INTO employee VALUES (3,'Priya','Data Science');
+INSERT INTO employee VALUES (4,'Kiran','Data Engineering');
+INSERT INTO employee VALUES (5,'Anita','Analytics');
+INSERT INTO employee VALUES (6,'Rahul','Data Science');
+INSERT INTO employee VALUES (7,'Meena','Data Engineering');
+INSERT INTO employee VALUES (8,'Arjun','Analytics');
+INSERT INTO employee VALUES (9,'Divya','Data Engineering');
+INSERT INTO employee VALUES (10,'Vijay','Data Science');
+
+
+SELECT * FROM employee;
+ 
+ ------my next question is retrive the highest team people in entire project---
+ 
+ 
+ SELECT team_name, COUNT(*) as count_emp_in_team from employee GROUP by team_name order by count_emp_in_team DESC LIMIT 1;
+ 
+ 
+ 
+ --- retrive the Lowest team people in entire project---
+ 
+ 
+ SELECT team_name ,count(*) as teamsize from employee GROUP by team_name ORDER by  teamsize ASC LIMIT 1;
+ 
+ -- want both lowest and highest team people name and detailscustomers
+ 
+ 
+ 
+SELECT * from (SELECT team_name ,count(*) as teamsize from employee GROUP by team_name ORDER by teamsize ASc Limit 1) as lowest_team_people
+
+UNION
+
+SELECT * from ( SELECT team_name ,COUNT(*) as teamsize from employee GROUP by team_name ORDER by teamsize DESC LIMIT 1) as highest_team_people;
+ 
+ 
+ 
+ 
+ ---Find top 2 teams with highest employees
+ 
+ 
+ SELECT team_name , count(*) as Toptwoteams from employee GROUP By team_name ORDER by Toptwoteams DESC Limit 2;
+ 
+ 
+ 
+ 
+ ----Get Employees From the Largest Team
+ 
+ 
+  SELECT * FROM employee WHERE team_name = ( SELECT team_name FROM employee GROUP BY team_name ORDER BY COUNT(*) DESC LIMIT 1);
+   
+ 
+ 
+ ---top employee per teamcustomers
+ 
+ SELECT emp_id, emp_name, team_name
+FROM (
+    SELECT *,
+           ROW_NUMBER() OVER (PARTITION BY team_name ORDER BY emp_id DESC) AS rn
+    FROM employee
+) t
+WHERE rn = 1;
+
+SELECT * from employee;
+ 
+
+--- employees joined last 30 days
+
+SELECT *
+FROM employee
+WHERE join_date >= CURRENT_DATE - INTERVAL 30 DAY;-- currently joindate column is not created so this query just for real use syntax identification
+
+--Real world secenarios---------demo
+
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    amount INT
+);
+
+
+INSERT INTO orders (order_id, customer_id, order_date, amount) VALUES
+(1, 101, '2026-03-01', 500),
+(2, 102, '2026-03-01', 200),
+(3, 101, '2026-03-02', 300),
+(4, 103, '2026-03-02', 700),
+(5, 102, '2026-03-03', 400),
+(6, 101, '2026-03-03', 250);
+
+SELECT * from orders;
+
+
+/*  Task 1
+
+Find total orders per customer.
+
+Expected output:
+
+| customer_id | total_orders | 
+
+*/
+SELECT * from orders;
+SELECT customer_id,count(customer_id) as total_orders from orders GROUP by customer_id order by total_orders ASC; 
+
+
+/*  Task 2
+
+Find total revenue generated per customer.
+
+Expected output:
+
+| customer_id | total_revenue |
+*/
+SELECT * from orders;
+SELECT customer_id, sum(amount) as total_revenue from orders GROUP by customer_id order By  total_revenue ASC;
+
+
+
+/* 
+
+Task 3
+
+Find top 3 customers based on spending.
+
+Expected output:
+
+| customer_id | total_spent |
+
+*/
+
+SELECT * from orders;
+
+SELECT customer_id, sum(amount) as total_spent from orders GROUP by customer_id order by total_spent DESC LIMIT 3;
+
+
+/*  
+Task 4
+
+Find daily total sales.
+
+Expected output:
+
+| order_date | total_sales |
+
+*/
+
+SELECT * from orders;
+
+SELECT order_date, sum(amount) as total_sales from orders GROUP by order_date order by total_sales desc;
+
+
+
+/* 
+
+Task 5 (Real Data Engineer Task)
+
+Find customers who placed more than 1 order.
+
+Expected output:
+
+| customer_id | order_count |
+
+*/
+
+
+SELECT * from orders;
+
+SELECT customer_id , COUNT(*) as order_count from orders GROUP by customer_id HAVING count(*) >1;
+
+
+
+/* Your manager says:
+
+"We want to identify inactive customers who haven't placed orders in the last 30 days."
+
+Assume today is 2026-03-10.
+
+Write a query to find them. 
+*/
+
+
+SELECT * from orders;
+
+
+SELECT customer_id  FROM orders GROUP by customer_id HAVING MAX(order_date) < DATE('now', '30');
+
+
+
+
+
+----------------------Day Two tasks --------------------
+
+/* 📊 Day 2 Real Data Engineering Task
+
+Now assume:
+
+You work in Food Delivery Company Data Team.demo
+
+*/
+
+
+CREATE TABLE deliveries (
+    delivery_id INT PRIMARY KEY,
+    driver_id VARCHAR(10),
+    delivery_date DATE,
+    delivery_time_minutes INT
+);
+
+
+INSERT INTO deliveries (delivery_id, driver_id, delivery_date, delivery_time_minutes) VALUES
+(1, 'D1', '2026-03-01', 30),
+(2, 'D2', '2026-03-01', 45),
+(3, 'D1', '2026-03-02', 25),
+(4, 'D3', '2026-03-02', 50),
+(5, 'D2', '2026-03-03', 40),
+(6, 'D1', '2026-03-03', 35);
+
+
+SELECT * from deliveries;
+
+
+/*
+
+Your Day 2 Tasks
+Task 1
+
+Find total deliveries per driver
+
+Expected output
+
+| driver_id | total_deliveries |
+
+*/
+
+
+SELECT  driver_id, count(driver_id) AS total_deliveries  from deliveries GROUP BY driver_id order By total_deliveries DESC;
+
+
+/*
+Task 2
+
+Find average delivery time per driver
+
+*/
+
+SELECT * from deliveries;
+
+SELECT driver_id,  avg(delivery_time_minutes) as avg_del_time from deliveries GROUP by driver_id ORDER by avg_del_time ASC;
+
+
+/*
+
+Task 3
+
+Find fastest driver (lowest average delivery time)deliveries
+
+*/
+
+SELECT driver_id as fastest_driver,  avg(delivery_time_minutes) as avg_del_time from deliveries GROUP by driver_id ORDER by avg_del_time ASC LIMIT 1;
+
+
+/*
+
+Task 4
+
+Find daily average delivery timedeliveries
+
+*/
+
+SELECT * from deliveries;
+
+-- this one im not understand
+
+
+/*
+
+Task 5 (Important Analytics Task)
+
+Find drivers who made more than 2 deliveries */
+
+
+SELECT driver_id , count(driver_id) as delivery_count from deliveries GROUP by driver_id HAVING COUNT(*) >2;
+
+
+/* 
+
+📊 Day 3 – Real Data Engineering Task (More Realistic)
+
+Now assume you work in Ride Sharing Company Data Team (like Uber).
+
+Table: rides  
+
+*/
+
+CREATE TABLE rides (
+    ride_id INT PRIMARY KEY,
+    driver_id VARCHAR(10),
+    city VARCHAR(50),
+    ride_fare INT
+);
+
+INSERT INTO rides (ride_id, driver_id, city, ride_fare) VALUES
+(1, 'D1', 'Hyderabad', 250),
+(2, 'D2', 'Chennai', 300),
+(3, 'D1', 'Hyderabad', 200),
+(4, 'D3', 'Bangalore', 450),
+(5, 'D2', 'Chennai', 350),
+(6, 'D1', 'Hyderabad', 400),
+(7, 'D3', 'Bangalore', 500);
+
+SELECT * from rides;
+
+
+/* Task 1
+
+Find total rides per driver
+
+*/
+
+SELECT * from rides;
+
+
+SELECT driver_id, COUNT(*) AS total_rides from rides GROUP By driver_id ;
+
+
+/*
+Task 2
+
+Find total revenue generated per driver
+
+*/
+
+SELECT driver_id ,sum(ride_fare) as total_revenue from rides GROUP by driver_id ;
+
+
+/*
+
+Task 3
+
+Find city with highest total revenue
+
+*/
+
+SELECT * FROM rides;
+
+SELECT city, sum(ride_fare) AS total_revenue from rides GROUP By city order by  total_revenue DESC Limit 1;
+
+
+/*
+
+Task 4
+
+Find top earning driver
+
+*/
+
+SELECT * FROM rides;
+
+SELECT driver_id, sum(ride_fare) as earning_driver from rides GROUP by driver_id order By earning_driver desc Limit 1;
+
+
+
+/*
+
+Task 5 (Important Analytics Task)
+
+Find average fare per city 
+
+*/
+
+
+SELECT * from rides;
+
+SELECT city , round(avg(ride_fare),2) as avg_fare from rides  GROUP By city order by avg_fare;
+
+
+/* Day 4 task*/
+
+
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(50)
+);
+
+INSERT INTO customers (customer_id, customer_name) VALUES
+(101, 'Ravi'),
+(102, 'Suresh'),
+(103, 'Priya'),
+(104, 'Anita');
+
+SELECT * from customers;
+
+ 
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    amount INT
+);
+
+
+INSERT INTO orders (order_id, customer_id, amount) VALUES
+(1, 101, 500),
+(2, 102, 300),
+(3, 101, 200),
+(4, 103, 700),
+(5, 102, 400);
+
+
+SELECT * FROM customers;
+SELECT * FROM orders;
+
+
+/*  
+Task 1
+
+Find total spending per customer
+
+(Expected: join both tables) 
+
+*/
+
+
+SELECT * FROM orders;
+
+SELECT customer_name,c.customer_id , sum(amount) aS spending from customers c JOIN orders o on c.customer_id=o.customer_id GROUP by c.customer_id;
+
+
+/* Task 2
+
+Find customer who spent the most
+
+*/
+
+SELECT customer_name, c.customer_id , sum(amount) aS total_spent from customers c
+join orders o on c.customer_id=o.customer_id GROUP by c.customer_id order by total_spent desc Limit 1;
+
+/* 
+Task 3
+
+Find customers who never placed any order
+
+(This is a very common real-world problem)
+
+*/
+
+SELECT * from  orders;
+
+SELECT * from  customers;
+
+SELECT customer_id , COUNT(*) As count_coustomers from  customers group By customer_id order by count_coustomers ;
+
+SELECT customer_id , COUNT(*) As count_coustomers from  orders group By customer_id order by count_coustomers ;
+
+ 
+ ---I understand but small confusion 
+ 
+ 
+ SELECT c.customer_name,c.customer_id 
+ from customers c LEFT JOIN orders o on c.customer_id=o.customer_id WHERE o.customer_id is NULL ;
+ 
+ 
+ 
+
+
+/*
+
+Find average order value per customer
+
+*/
+
+
+SELECT * from customers;
+
+SELECT * from orders;
+
+
+SELECT   c.customer_id , avg(o.amount) AS avg_order_value from customers c JOIN orders o on c.customer_id=o.customer_id GROUP BY
+
+c.customer_id order by avg_order_value ASC;
+
+
+/*  Day 5 Task */
+
+
+
+CREATE TABLE employee_sales (
+    emp_id INT,
+    emp_name VARCHAR(50),
+    department VARCHAR(50),
+    sales INT
+);
+
+
+
+
+INSERT INTO employee_sales VALUES
+(1,'Ravi','Electronics',5000),
+(2,'Suresh','Electronics',7000),
+(3,'Priya','Electronics',6000),
+(4,'Anita','Clothing',4000),
+(5,'Kiran','Clothing',6500),
+(6,'Meena','Clothing',5500);
+
+
+SELECT * from employee_sales;
+
+
+/*  Task 1
+
+Find total sales per department 
+*/
+
+
+
+SELECT department, sum(sales) AS total_sales from employee_sales 
+GROUP by department;
+
+
+/* Task 2
+
+Find top employee in each department
+
+(IMPORTANT SQL INTERVIEW QUESTION)  
+
+*/
+
+SELECT * from employee_sales;
+
+--single department--
+
+SELECT department, emp_name,  max(sales) as highest_sales_emp from employee_sales WHERE department='Electronics';
+
+ 
+SELECT * from employee_sales;
+
+
+ SELECT * from (SELECT department, emp_name, sales, ROW_NUMBER() OVER(PARTITION by department order by sales desc) as row_num from employee_sales)t where row_num=1;
+
+
+
+/* Task 3 — Second Highest Employee Per Department  
+*/
+
+SELECT * from ( SELECT department,emp_name,sales ,ROW_NUMBER() OVER(PARTITION by department order by sales desc) as row_num from employee_sales)t WHERE row_num=2;
+
+
+/* Task 4
+
+Rank employees based on sales within department
+
+(Hint: RANK() or ROW_NUMBER())
+
+*/
+
+SELECT sales, department, emp_name, RANK() OVER(PARTITION by department order by sales desc) as row_num from employee_sales;
+
+
+
+/*  Task 5 (Very Real Data Engineer Task)
+
+Find running total of sales per department 
+*/
+
+SELECT department,  emp_name, SUM(sales) OVER(PARTITION BY department ORDER by sales desc) as running_total from employee_sales;
+
+
+
+/* Day 6 */
+
+CREATE TABLE watch_history (
+    user_id INT,
+    movie_name VARCHAR(100),
+    watch_time_minutes INT,
+    watch_date DATE
+);
+
+INSERT INTO watch_history VALUES
+(1,'Avengers',120,'2026-03-01'),
+(1,'Batman',90,'2026-03-02'),
+(2,'Avengers',110,'2026-03-01'),
+(2,'Spiderman',130,'2026-03-02'),
+(3,'Batman',100,'2026-03-03'),
+(3,'Avengers',140,'2026-03-04');
+
+SELECT * from watch_history;
+
+
+/* Task 1
+Find total watch time per user */
+
+SELECT user_id , sum(watch_time_minutes) As total_watch_time from watch_history GROUP by user_id order by total_watch_time ASC;
+
+
+/* Task 2
+
+Find most watched movie */
+
+SELECT * from watch_history;
+
+SELECT  movie_name,  count(movie_name) aS most_watched_movies from watch_history
+GROUP by movie_name ORDER by most_watched_movies DESC Limit 1;
+
+
+/*Task 3
+
+Find top movie per user
+
+(Hard interview question)  */
+
+
+
+
+/* Find daily total watch time  */
+
+
+SELECT watch_date, sum(watch_time_minutes) As total_watch_time_per_day 
+from watch_history GROUP by watch_date ORDER by watch_date;
+
+
+/*
+Find users who watched more than 200 minutes total  */
+
+SELECT * from watch_history;
+
+SELECT  watch_date, sum(watch_time_minutes) As total_watch_time_per_day from watch_history
+GROUP by  watch_date HAVING sum(watch_time_minutes)>200 ORDER by watch_date DESC;
+
+
+
