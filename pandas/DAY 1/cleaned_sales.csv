@@ -1,0 +1,8 @@
+order_id,customer,product,category,amount,quantity,order_date,status,revenue
+101,Alice,Laptop,Electronics,75000,1,2024-01-15,completed,75000
+102,Bob,Mouse,Electronics,500,2,2024-01-15,completed,1000
+103,Unknown,Keyboard,Electronics,1500,1,2024-01-16,pending,1500
+105,Bob,Monitor,Electronics,12000,1,2024-01-17,cancelled,12000
+106,Alice,Mouse,Electronics,450,3,2024-01-17,completed,1350
+107,Unknown,Keyboard,Electronics,1500,2,2024-01-18,pending,3000
+108,Eve,Laptop,Electronics,90000,1,2024-01-18,completed,90000

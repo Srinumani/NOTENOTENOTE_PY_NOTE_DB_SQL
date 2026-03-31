@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); padding: 16px 0; }
+
+.layer { border-radius: var(--border-radius-lg); margin-bottom: 16px; overflow: hidden; border: 0.5px solid var(--color-border-tertiary); }
+
+.layer-header { padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.layer-icon { font-size: 24px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.layer-title { font-size: 15px; font-weight: 500; }
+.layer-sub { font-size: 12px; margin-top: 2px; }
+
+.layer-body { padding: 14px 16px; border-top: 0.5px solid var(--color-border-tertiary); }
+
+.compare-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.compare-box { flex: 1; border-radius: 8px; padding: 10px 12px; border: 0.5px solid var(--color-border-tertiary); }
+.compare-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.compare-val { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+
+.code-block { border-radius: 8px; padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; line-height: 1.7; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); margin-top: 10px; color: var(--color-text-secondary); }
+
+.tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; margin-right: 4px; margin-bottom: 4px; }
+
+/* Bronze */
+.bronze-head { background: #FAECE7; }
+.bronze-icon-bg { background: #F0997B; }
+.bronze-title { color: #993C1D; }
+.bronze-sub { color: #D85A30; }
+.bronze-tag { background: #F5C4B3; color: #993C1D; }
+@media (prefers-color-scheme: dark) {
+  .bronze-head { background: #4A1B0C; }
+  .bronze-title { color: #F0997B; }
+  .bronze-sub { color: #F5C4B3; }
+  .bronze-tag { background: #712B13; color: #F0997B; }
+}
+
+/* Silver */
+.silver-head { background: #F1EFE8; }
+.silver-icon-bg { background: #888780; }
+.silver-title { color: #444441; }
+.silver-sub { color: #5F5E5A; }
+.silver-tag { background: #D3D1C7; color: #444441; }
+@media (prefers-color-scheme: dark) {
+  .silver-head { background: #2C2C2A; }
+  .silver-title { color: #D3D1C7; }
+  .silver-sub { color: #B4B2A9; }
+  .silver-tag { background: #444441; color: #D3D1C7; }
+}
+
+/* Gold */
+.gold-head { background: #FAEEDA; }
+.gold-icon-bg { background: #EF9F27; }
+.gold-title { color: #854F0B; }
+.gold-sub { color: #BA7517; }
+.gold-tag { background: #FAC775; color: #633806; }
+@media (prefers-color-scheme: dark) {
+  .gold-head { background: #412402; }
+  .gold-title { color: #FAC775; }
+  .gold-sub { color: #EF9F27; }
+  .gold-tag { background: #633806; color: #FAC775; }
+}
+
+.arrow-down { text-align: center; font-size: 20px; color: var(--color-text-secondary); margin: 4px 0; }
+
+.file-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.file-icon { width: 28px; height-28px; font-size: 16px; }
+.file-name { font-size: 12px; font-family: var(--font-mono); color: var(--color-text-secondary); }
+.file-note { font-size: 11px; color: var(--color-text-secondary); margin-left: auto; }
+
+.rule-box { border-radius: 8px; padding: 10px 12px; margin-top: 10px; border-left: 3px solid; }
+.rule-text { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+.rule-title { font-size: 11px; font-weight: 500; margin-bottom: 4px; }
+
+.section-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 12px; margin-top: 20px; }
+
+.real-world { border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); overflow: hidden; margin-top: 20px; }
+.rw-header { padding: 10px 16px; background: var(--color-background-secondary); font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.rw-body { padding: 14px 16px; }
+.rw-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.rw-row:last-child { border-bottom: none; }
+.rw-num { font-size: 11px; font-weight: 500; width: 18px; height: 18px; border-radius: 50%; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-text-secondary); margin-top: 1px; }
+.rw-content { flex: 1; }
+.rw-title { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.rw-desc { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; line-height: 1.5; }
+</style>
+
+<body>
+
+<div class="section-title">What actually happens on your computer / Azure right now 👇</div>
+
+<!-- Bronze -->
+<div class="layer">
+  <div class="layer-header bronze-head">
+    <div class="layer-icon bronze-icon-bg" style="color:white">🥉</div>
+    <div>
+      <div class="layer-title bronze-title">Bronze Layer — Raw Storage</div>
+      <div class="layer-sub bronze-sub">Save everything exactly as it came. Touch nothing.</div>
+    </div>
+  </div>
+  <div class="layer-body">
+    <div class="compare-row">
+      <div class="compare-box">
+        <div class="compare-label">What goes in</div>
+        <div class="compare-val">Raw API response, CSV dump from client, database export — exactly as received. Nulls, duplicates, wrong types — all kept.</div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label">What you do to it</div>
+        <div class="compare-val">Nothing. Zero changes. Just save it as-is. This is your safety net forever.</div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-icon">📄</div>
+      <div class="file-name">bronze_countries.parquet</div>
+      <div class="file-note"><span class="tag bronze-tag">raw</span><span class="tag bronze-tag">untouched</span></div>
+    </div>
+    <div class="code-block">
+# Our Day 2 code — we just saved raw API data<br>
+df_countries.to_parquet('bronze_countries.parquet')
+    </div>
+    <div class="rule-box" style="border-color:#D85A30; background:#FAECE7;">
+      <div class="rule-title bronze-title">Senior rule 💬</div>
+      <div class="rule-text">If your Silver or Gold pipeline breaks 3 months later, you come back to Bronze and reprocess. Without Bronze — you have to call the API again, pray the data is same. It never is. Bronze saves your job.</div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow-down">↓</div>
+
+<!-- Silver -->
+<div class="layer">
+  <div class="layer-header silver-head">
+    <div class="layer-icon silver-icon-bg" style="color:white">🥈</div>
+    <div>
+      <div class="layer-title silver-title">Silver Layer — Cleaned & Trusted</div>
+      <div class="layer-sub silver-sub">Clean, join, fix types. Data is now reliable.</div>
+    </div>
+  </div>
+  <div class="layer-body">
+    <div class="compare-row">
+      <div class="compare-box">
+        <div class="compare-label">What goes in</div>
+        <div class="compare-val">Bronze data — messy, raw, untrusted.</div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label">What you do to it</div>
+        <div class="compare-val">Remove nulls, fix dates, remove duplicates, join tables, add audit columns, standardize formats.</div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-icon">📄</div>
+      <div class="file-name">silver_countries.parquet</div>
+      <div class="file-note"><span class="tag silver-tag">cleaned</span><span class="tag silver-tag">joined</span><span class="tag silver-tag">trusted</span></div>
+    </div>
+    <div class="code-block">
+# Our Day 2 code — cleaned + joined with GDP<br>
+df_left = pd.merge(df_countries, df_gdp, on='country_name', how='left')<br>
+df_left['gdp_usd_billion'] = df_left['gdp_usd_billion'].fillna(0)<br>
+df_left.to_parquet('silver_countries.parquet')
+    </div>
+    <div class="rule-box" style="border-color:#888780; background:#F1EFE8;">
+      <div class="rule-title silver-title">Senior rule 💬</div>
+      <div class="rule-text">Silver is where data quality lives. Any analyst, any team can trust Silver data. But it's not shaped for any specific question yet — it's just clean and complete.</div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow-down">↓</div>
+
+<!-- Gold -->
+<div class="layer">
+  <div class="layer-header gold-head">
+    <div class="layer-icon gold-icon-bg" style="color:white">🥇</div>
+    <div>
+      <div class="layer-title gold-title">Gold Layer — Business Ready</div>
+      <div class="layer-sub gold-sub">Aggregated, summarized, shaped for reports & dashboards.</div>
+    </div>
+  </div>
+  <div class="layer-body">
+    <div class="compare-row">
+      <div class="compare-box">
+        <div class="compare-label">What goes in</div>
+        <div class="compare-val">Silver data — clean and trusted.</div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-label">What you do to it</div>
+        <div class="compare-val">GROUP BY, SUM, AVG, COUNT. Shape it to answer specific business questions. Power BI reads from here.</div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-icon">📄</div>
+      <div class="file-name">gold_subregion_summary.parquet</div>
+      <div class="file-note"><span class="tag gold-tag">aggregated</span><span class="tag gold-tag">dashboard-ready</span></div>
+    </div>
+    <div class="code-block">
+# Our Day 2 code — grouped by subregion<br>
+subregion_summary = df.groupby('subregion').agg(<br>
+&nbsp;&nbsp;country_count=('country_name','count'),<br>
+&nbsp;&nbsp;total_population=('population','sum')<br>
+).reset_index()<br>
+subregion_summary.to_parquet('gold_subregion_summary.parquet')
+    </div>
+    <div class="rule-box" style="border-color:#EF9F27; background:#FAEEDA;">
+      <div class="rule-title gold-title">Senior rule 💬</div>
+      <div class="rule-text">Gold is what business teams see. Manager opens Power BI — they're reading Gold. You can have multiple Gold tables for different teams — finance gold, sales gold, operations gold — all from same Silver.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Real world mapping -->
+<div class="real-world">
+  <div class="rw-header">Where these files actually live — Local vs Azure</div>
+  <div class="rw-body">
+    <div class="rw-row">
+      <div class="rw-num">1</div>
+      <div class="rw-content">
+        <div class="rw-title">Right now on your computer 💻</div>
+        <div class="rw-desc">bronze_countries.parquet, silver_countries.parquet, gold_subregion_summary.parquet — sitting in your de_journey folder. That IS a medallion architecture. Small scale, but exact same concept.</div>
+      </div>
+    </div>
+    <div class="rw-row">
+      <div class="rw-num">2</div>
+      <div class="rw-content">
+        <div class="rw-title">In Azure Data Lake (next week) ☁️</div>
+        <div class="rw-desc">Same files, same names — but stored in Azure Blob folders: /bronze/, /silver/, /gold/. ADF moves data in. Databricks transforms Bronze → Silver → Gold. Synapse reads Gold.</div>
+      </div>
+    </div>
+    <div class="rw-row">
+      <div class="rw-num">3</div>
+      <div class="rw-content">
+        <div class="rw-title">In a real company project 🏢</div>
+        <div class="rw-desc">Swiggy example — Bronze: raw orders from app. Silver: cleaned orders, joined with restaurant data. Gold: daily revenue by city, top restaurants, delivery time averages. Power BI reads Gold.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
