@@ -22,9 +22,9 @@ DATA ENGINEER TOPICS (0 → 2 YEARS)
 	• Exception Handling
 	• Working with APIs
 	• Pandas Basics
-	• Data Transformation in Python --don’t no
+	• Data Transformation in Python  
 	• Logging
-	• Virtual Environments  --don’t no
+	• Virtual Environments   
 
 3️⃣ Data Warehousing Concepts
 	• OLTP vs OLAP  
@@ -32,21 +32,21 @@ DATA ENGINEER TOPICS (0 → 2 YEARS)
 	• Dimension Table
 	• Star Schema
 	• Snowflake Schema
-	• Surrogate Keys --don’t no
-	• Grain Definition --don’t no
+	• Surrogate Keys  
+	• Grain Definition  
 	• Slowly Changing Dimensions (SCD Type 1, Type 2)
-	• Data Mart vs Data Warehouse--don’t no
+	• Data Mart vs Data Warehouse- 
 
 4️⃣ ETL / ELT Concepts
 	• ETL vs ELT
 	• Data Extraction Methods
 	• Data Transformation Logic
 	• Data Loading Strategies
-	• Batch Processing  --don’t no
-	• Real-Time Processing Basics --don’t no
-	• Idempotent Pipelines  --don’t no
+	• Batch Processing  
+	• Real-Time Processing Basics   
+	• Idempotent Pipelines   
 
-5️⃣ Data Pipeline Concepts don’t no this concepts
+5️⃣ Data Pipeline Concepts  
 	• Pipeline Design
 	• DAG (Directed Acyclic Graph)
 	• Scheduling Jobs
@@ -73,7 +73,7 @@ DATA ENGINEER TOPICS (0 → 2 YEARS)
 	• Schema-on-read vs Schema-on-write
 
 
-8️⃣ Big Data Fundamentals   from here I don’t no anything 8 to 17
+8️⃣ Big Data Fundamentals    
 	• Distributed Systems Basics
 	• Parallel Processing
 	• Partitioning
